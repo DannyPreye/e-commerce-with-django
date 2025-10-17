@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 
-from api.serializers import CartItemSerializer, CartSerializer, CategoryDetailSerializer, CategoryListSerializer, ProductListSerializer, ProductDetailSerializer
-from .models import Cart, CartItem, Product, Category
+from api.serializers import CartItemSerializer, CartSerializer, CategoryDetailSerializer, CategoryListSerializer, ProductListSerializer, ProductDetailSerializer, ReviewSerializer
+from .models import Cart, CartItem, Product, Category, Review
 from rest_framework.response import Response
 
 
@@ -54,3 +54,44 @@ def update_cart_item_quantity(request, cart_item_id):
     cart_item.save()
     serializer = CartItemSerializer(cart_item)
     return Response(serializer.data)
+
+@api_view(['POST'])
+def add_review(request, product_id):
+    product = Product.objects.get(id=product_id)
+    user = request.user
+    rating = request.data.get('rating')
+    review_text = request.data.get('review')
+
+    if Review.objects.filter(product=product, user=user).exists():
+        return Response({"error": "You have already reviewed this product."}, status=400)
+
+    review = Review.objects.create(
+        product=product,
+        user=user,
+        rating=rating,
+        review=review_text
+    )
+    review.save()
+
+    serializer = ReviewSerializer(review)
+    return Response(serializer.data)
+
+
+@api_view(["PUT"])
+def update_review(request, review_id):
+    review = Review.objects.get(id=review_id)
+    rating = request.data.get("rating")
+    review_text = request.data.get("review")
+
+    review.rating = rating
+    review.review = review_text
+    review.save()
+
+    serializer = ReviewSerializer(review)
+    return Response(serializer.data)
+
+@api_view(["DELETE"])
+def delete_review(request, review_id):
+    review = Review.objects.get(id=review_id)
+    review.delete()
+    return Response({"message": "Review deleted successfully."}, status=204)

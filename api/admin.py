@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomerUser, Category, Product, Cart, CartItem
+from .models import CustomerUser, Category, Product, Cart, CartItem, ProductRating, Review
 
 # Register your models here.
 # admin.site.register(CustomerUser)
@@ -27,6 +27,8 @@ admin.site.register(Category, CategoryAdmin)
 
 admin.site.register(Cart)
 admin.site.register(CartItem)
+admin.site.register(Review)
+admin.site.register(ProductRating)
 
 admin.site.site_header = "E-Commerce Admin"
 admin.site.site_title = "E-Commerce Admin Portal"

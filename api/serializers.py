@@ -1,5 +1,6 @@
+from django.conf import settings
 from rest_framework import serializers
-from .models import Product , Category, Cart, CartItem
+from .models import Product , Category, Cart, CartItem, Review
 
 class ProductListSerializer(serializers.ModelSerializer):
     class Meta:
@@ -62,3 +63,14 @@ class CartStatsSerializer(serializers.ModelSerializer):
 
     def get_total_price(self, obj):
         return sum([item.product.price * item.quantity for item in obj.items.all()])
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = settings.AUTH_USER_MODEL
+        fields = ["id", "profile_picture_url", "email", "first_name", "last_name"]
+
+class ReviewSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    class Meta:
+        model = Review
+        fields = ["id", "user", "rating", "review", "created_at", "updated_at"]
